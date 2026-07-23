@@ -1,0 +1,3 @@
+# GitHub Release에 직접 업로드하는 대용량 배포 자산
+/release-assets/*
+!/release-assets/README.md

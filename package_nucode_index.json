@@ -1,0 +1,66 @@
+{
+  "packages": [
+    {
+      "name": "nucode",
+      "maintainer": "EIDOSDATA / NUCODE",
+      "websiteURL": "https://github.com/EIDOSDATA/NUCODE_Arduino_Packages",
+      "help": {
+        "online": "https://github.com/EIDOSDATA/NUCODE_Arduino_Packages/issues"
+      },
+      "platforms": [
+        {
+          "name": "NUCODE Zephyr Boards",
+          "architecture": "zephyr",
+          "version": "0.2.1",
+          "category": "Contributed",
+          "help": {
+            "online": "https://github.com/EIDOSDATA/NUCODE_Arduino_Packages"
+          },
+          "url": "https://github.com/EIDOSDATA/NUCODE_Arduino_Packages/releases/download/v0.2.1/nucode-zephyr-0.2.1.zip",
+          "archiveFileName": "nucode-zephyr-0.2.1.zip",
+          "checksum": "SHA-256:4C6CFC52B06502005DCEE1077C3C55A77E13A637177DD9B7BEC50D2A5CD7FF42",
+          "size": "16488145",
+          "boards": [
+            {
+              "name": "NU40-DK-Basic V2"
+            }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "nucode",
+              "name": "nu-zephyr-tools",
+              "version": "14.3.0-nu7"
+            }
+          ],
+          "discoveryDependencies": [
+            {
+              "packager": "builtin",
+              "name": "serial-discovery"
+            }
+          ],
+          "monitorDependencies": [
+            {
+              "packager": "builtin",
+              "name": "serial-monitor"
+            }
+          ]
+        }
+      ],
+      "tools": [
+        {
+          "name": "nu-zephyr-tools",
+          "version": "14.3.0-nu7",
+          "systems": [
+            {
+              "host": "x86_64-mingw32",
+              "url": "https://github.com/EIDOSDATA/NUCODE_Arduino_Packages/releases/download/v0.2.1/nu-zephyr-tools-14.3.0-nu7-windows_amd64.zip",
+              "archiveFileName": "nu-zephyr-tools-14.3.0-nu7-windows_amd64.zip",
+              "checksum": "SHA-256:E0D8AE1F21E2A6CDF8B85BD24CDEED4022255A52FB0AF17C69B4F88F51F16EBF",
+              "size": "69939605"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
