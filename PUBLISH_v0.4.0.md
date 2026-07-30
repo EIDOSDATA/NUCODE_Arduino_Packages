@@ -54,3 +54,20 @@ Release Asset 게시가 완료된 직후 다음 작업을 수행한다.
 
 Release Asset URL이 활성화되기 전에는 Root 안정판 Index 0.3.1을 변경하지
 않는다.
+
+## 게시 후 Asset/Index 무결성 Gate
+
+Root Index를 Push하기 전에 GitHub Release API가 반환하는 각 Asset의
+`size`와 `digest`를 Root Index의 `size`와 `checksum`에 대조한다. 로컬에서
+재생성한 Archive가 아니라 실제 게시된 Asset을 기준으로 판정한다.
+
+특히 `.tar.gz`는 Source가 같아도 재생성 Metadata에 따라 Byte Hash와 Size가
+달라질 수 있으므로 다음 세 Host를 반드시 개별 확인한다.
+
+1. `x86_64-pc-linux-gnu`
+2. `aarch64-linux-gnu`
+3. `arm64-apple-darwin`
+
+불일치가 있으면 Asset과 Index 세대를 섞지 않는다. 이미 게시된 Asset이
+정상이고 Manifest/SHA256SUMS와 일치하면 Asset을 교체하지 않고 Root Index를
+게시 Asset 기준으로 교정한다.

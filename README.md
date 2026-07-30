@@ -62,6 +62,17 @@ Archive는 정적 무결성 Gate와 Windows 격리 설치·Blink/Servo Compile·
 승인됐다. GitHub `v0.4.0` 일반/latest Release와 Root Board Manager Index를
 공개했으며, 공개 Index를 통한 설치·Compile·Upload·Serial 확인도 통과했다.
 
+### 0.4.0 Unix Index Metadata 교정
+
+최초 0.4.0 Root Index에는 게시 직전 다시 생성한 Unix Archive의 Hash/Size가
+기록됐지만 GitHub Release에는 기능 Source가 같은 이전 Archive 세대가
+게시됐다. Linux/macOS Arduino IDE의 Checksum 검사를 통과하도록 Root Index를
+실제 GitHub Asset과 `SHA256SUMS.txt` 기준으로 교정했다.
+
+교정 전에 설치를 시도한 Linux 사용자는 Arduino IDE를 종료하고
+`~/.arduino15/staging/packages`의 nu11 Archive와
+`~/.arduino15/package_nucode_index.json`을 제거한 뒤 다시 설치한다.
+
 ## 지원 정책
 
 Platform 0.2.1/Tool 14.3.0-nu7은 지원 종료(EOL)됐으며 GitHub 배포와

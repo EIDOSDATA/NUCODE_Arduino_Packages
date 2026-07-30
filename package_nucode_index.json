@@ -62,22 +62,22 @@
               "host": "x86_64-pc-linux-gnu",
               "url": "https://github.com/EIDOSDATA/NUCODE_Arduino_Packages/releases/download/v0.4.0/nu-zephyr-tools-14.3.0-nu11-linux_amd64.tar.gz",
               "archiveFileName": "nu-zephyr-tools-14.3.0-nu11-linux_amd64.tar.gz",
-              "checksum": "SHA-256:8B85062788835C0E0739BD25029DA3267227B7A44A1FD59BD0A19C3FC86912B1",
-              "size": "63263191"
+              "checksum": "SHA-256:11F5E314E3D011210811F08784F31F1A5A55BD6A8F80A3FDC14109F1E84C065F",
+              "size": "63263188"
             },
             {
               "host": "aarch64-linux-gnu",
               "url": "https://github.com/EIDOSDATA/NUCODE_Arduino_Packages/releases/download/v0.4.0/nu-zephyr-tools-14.3.0-nu11-linux_arm64.tar.gz",
               "archiveFileName": "nu-zephyr-tools-14.3.0-nu11-linux_arm64.tar.gz",
-              "checksum": "SHA-256:1143CCF73D1313D64B823F926342BDD6D4000117C757E4A820EAB4BDB8EE0D51",
-              "size": "62331109"
+              "checksum": "SHA-256:FEB3DBD1D31883ED3D240DBC141558B011A9BF1D59CB0F1D9738092A0C596D4E",
+              "size": "62331099"
             },
             {
               "host": "arm64-apple-darwin",
               "url": "https://github.com/EIDOSDATA/NUCODE_Arduino_Packages/releases/download/v0.4.0/nu-zephyr-tools-14.3.0-nu11-macos_arm64.tar.gz",
               "archiveFileName": "nu-zephyr-tools-14.3.0-nu11-macos_arm64.tar.gz",
-              "checksum": "SHA-256:E610134E78C4C7FEA080B6FD0560A9BE82F3E863ECAD1F0C9B19B36028B27A93",
-              "size": "55365742"
+              "checksum": "SHA-256:F9BACCD6E49753C473859D99196D1A5C9A8F1A636C3285635C07DC8E9469D90C",
+              "size": "55365750"
             }
           ]
         }
