@@ -4,17 +4,20 @@
 #
 # /**
 #  * @file Test-NuUnixCleanHost.sh
-#  * @brief Linux/macOS의 빈 Arduino Data/User에서 Platform 0.3.1을 검증한다.
+#  * @brief Linux/macOS의 빈 Arduino Data/User에서 지정 Platform을 검증한다.
 #  */
 
 set -euo pipefail
 
 PLATFORM_VERSION="0.3.1"
+EXPECTED_CORE_VERSION=""
+EXPECTED_TOOL_VERSION=""
 FQBN="nucode:zephyr:nu40dk_v2"
 INDEX_URL=""
 PORT=""
 ARDUINO_CLI="${ARDUINO_CLI:-arduino-cli}"
 TEST_ROOT=""
+ENFORCE_CLEAN_HOST=0
 
 ## @brief 명령 사용법을 출력한다.
 usage()
@@ -25,17 +28,23 @@ Usage:
 
 Options:
   --arduino-cli PATH   Arduino CLI 실행 파일. 기본값: arduino-cli
+  --platform-version V 설치하고 검사할 Platform Version. 기본값: 0.3.1
+  --core-version V     SBOM에서 확인할 ArduinoCore-Zephyr Version
+  --tool-version V     설치 경로에서 확인할 nu-zephyr-tools Version
   --port PORT          실제 NU40 CDC Port. 지정하면 Blink UF2를 업로드한다.
   --root PATH          격리 Data/User/Build와 Evidence 경로
+  --enforce-clean-host NCS/Go/West/ARM GCC/제품 저장소가 있으면 실패
   --help               도움말
 
 Examples:
   bash Test-NuUnixCleanHost.sh \
     --index-url https://raw.githubusercontent.com/EIDOSDATA/NUCODE_Arduino_Packages/main/package_nucode_index.json \
+    --platform-version 0.3.1 \
     --port /dev/ttyACM0
 
   bash Test-NuUnixCleanHost.sh \
     --index-url https://raw.githubusercontent.com/EIDOSDATA/NUCODE_Arduino_Packages/main/package_nucode_index.json \
+    --platform-version 0.3.1 \
     --port /dev/cu.usbmodemNU40
 EOF
 }
@@ -51,6 +60,18 @@ do
             ARDUINO_CLI="$2"
             shift 2
             ;;
+        --platform-version)
+            PLATFORM_VERSION="$2"
+            shift 2
+            ;;
+        --core-version)
+            EXPECTED_CORE_VERSION="$2"
+            shift 2
+            ;;
+        --tool-version)
+            EXPECTED_TOOL_VERSION="$2"
+            shift 2
+            ;;
         --port)
             PORT="$2"
             shift 2
@@ -58,6 +79,10 @@ do
         --root)
             TEST_ROOT="$2"
             shift 2
+            ;;
+        --enforce-clean-host)
+            ENFORCE_CLEAN_HOST=1
+            shift
             ;;
         --help|-h)
             usage
@@ -77,6 +102,33 @@ then
     exit 2
 fi
 
+if ((ENFORCE_CLEAN_HOST == 1))
+then
+    for external_command in west go arm-zephyr-eabi-gcc
+    do
+        if command -v "$external_command" >/dev/null 2>&1
+        then
+            printf 'Clean-host 조건 위반: %s가 PATH에 있습니다.\n' \
+                "$external_command" >&2
+            exit 2
+        fi
+    done
+
+    for forbidden_path in \
+        "$HOME/GitHub/NU_nRF_Arduino_Platform" \
+        "$HOME/NU_nRF_Arduino_Platform" \
+        "$HOME/ncs" \
+        "/opt/nordic/ncs"
+    do
+        if [[ -e "$forbidden_path" ]]
+        then
+            printf 'Clean-host 조건 위반: 개발 경로가 있습니다: %s\n' \
+                "$forbidden_path" >&2
+            exit 2
+        fi
+    done
+fi
+
 if [[ "$ARDUINO_CLI" == */* ]]
 then
     if [[ ! -x "$ARDUINO_CLI" ]]
@@ -92,7 +144,7 @@ fi
 
 if [[ -z "$TEST_ROOT" ]]
 then
-    TEST_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/nucode-031.XXXXXX")"
+    TEST_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/nucode-clean.XXXXXX")"
 else
     if [[ -d "$TEST_ROOT" ]] && [[ -n "$(ls -A "$TEST_ROOT")" ]]
     then
@@ -142,7 +194,7 @@ void setup()
 void loop()
 {
     digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-    Serial.println("NUCODE 0.3.1 UNIX CLEAN HOST");
+    Serial.println("NUCODE UNIX CLEAN HOST");
     delay(1000);
 }'
 
@@ -200,7 +252,7 @@ write_sketch "ArduinoBleSmoke" '
 void setup()
 {
     BLE.begin();
-    BLE.setLocalName("NU40-031");
+    BLE.setLocalName("NU40-CLEAN");
     BLE.advertise();
 }
 
@@ -216,7 +268,7 @@ NUBleUart bleUart;
 
 void setup()
 {
-    bleUart.begin("NU40-031-NUS");
+    bleUart.begin("NU40-CLEAN-NUS");
 }
 
 void loop()
@@ -230,6 +282,37 @@ printf '>> Platform Index 갱신: %s\n' "$INDEX_URL"
 printf '>> Platform 설치: nucode:zephyr@%s\n' "$PLATFORM_VERSION"
 "$ARDUINO_CLI" --config-file "$CONFIG_PATH" \
     core install "nucode:zephyr@$PLATFORM_VERSION"
+
+INSTALLED_PLATFORM_ROOT="$DATA_ROOT/packages/nucode/hardware/zephyr/$PLATFORM_VERSION"
+
+if [[ ! -d "$INSTALLED_PLATFORM_ROOT" ]]
+then
+    printf '요청 Platform 설치 경로가 없습니다: %s\n' \
+        "$INSTALLED_PLATFORM_ROOT" >&2
+    exit 2
+fi
+
+if [[ -n "$EXPECTED_CORE_VERSION" ]]
+then
+    SBOM_PATH="$INSTALLED_PLATFORM_ROOT/sbom.cdx.json"
+
+    if [[ ! -f "$SBOM_PATH" ]] ||
+        ! grep -A 2 '"name": "ArduinoCore-Zephyr"' "$SBOM_PATH" |
+            grep -Fq "\"version\": \"$EXPECTED_CORE_VERSION\""
+    then
+        printf 'ArduinoCore-Zephyr Version 검증 실패: expected=%s\n' \
+            "$EXPECTED_CORE_VERSION" >&2
+        exit 2
+    fi
+fi
+
+if [[ -n "$EXPECTED_TOOL_VERSION" ]] &&
+    [[ ! -d "$DATA_ROOT/packages/nucode/tools/nu-zephyr-tools/$EXPECTED_TOOL_VERSION" ]]
+then
+    printf 'Host Tool Version 검증 실패: expected=%s\n' \
+        "$EXPECTED_TOOL_VERSION" >&2
+    exit 2
+fi
 
 for sketch in Blink ServoSmoke WireSmoke SpiSmoke ArduinoBleSmoke NuBleUartSmoke
 do
@@ -256,11 +339,21 @@ HOST_OS="$(uname -s)"
 HOST_ARCH="$(uname -m)"
 TIMESTAMP="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 
+if ((ENFORCE_CLEAN_HOST == 1))
+then
+    CLEAN_HOST_ENFORCED=true
+else
+    CLEAN_HOST_ENFORCED=false
+fi
+
 cat >"$EVIDENCE_PATH" <<EOF
 {
   "schema_version": 1,
   "timestamp_utc": "$TIMESTAMP",
   "platform_version": "$PLATFORM_VERSION",
+  "expected_core_version": "$EXPECTED_CORE_VERSION",
+  "expected_tool_version": "$EXPECTED_TOOL_VERSION",
+  "clean_host_enforced": $CLEAN_HOST_ENFORCED,
   "fqbn": "$FQBN",
   "host_os": "$HOST_OS",
   "host_arch": "$HOST_ARCH",
@@ -272,7 +365,8 @@ cat >"$EVIDENCE_PATH" <<EOF
 }
 EOF
 
-printf '\nNUCODE Platform 0.3.1 Unix Clean-host 자동 시험 통과\n'
+printf '\nNUCODE Platform %s Unix Clean-host 자동 시험 통과\n' \
+    "$PLATFORM_VERSION"
 printf 'Host     : %s/%s\n' "$HOST_OS" "$HOST_ARCH"
 printf 'Compile  : Blink, Servo, Wire, SPI, ArduinoBLE, NUBleUart PASS\n'
 printf 'Upload   : %s\n' "$UPLOAD_RESULT"

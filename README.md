@@ -49,6 +49,21 @@ Linux에서는 `--port /dev/ttyACM0`처럼 실제 CDC 장치 경로를 지정한
 Board Manager Index는 현재 지원 Version인 0.3.1과 nu9만 제공한다. 이전 개발
 Version은 Index에 누적하지 않는다.
 
+## Platform 0.4.0 Release Candidate 시험
+
+ArduinoCore-Zephyr 0.90.0/Loader ABI 0.4 통합 후보는 안정판 Index와 분리된
+`0.4.0-rc.1`/Tool `14.3.0-nu10`으로 시험한다. 일반 사용자는 이 RC를
+설치하지 않는다. 시험 전용 Additional Boards Manager URL은 다음과 같다.
+
+```text
+https://raw.githubusercontent.com/EIDOSDATA/NUCODE_Arduino_Packages/main/rc/v0.4.0-rc.1/package_nucode_index.json
+```
+
+이 RC는 Windows x86-64, Linux x86-64/arm64와 macOS arm64 Archive 정적
+검증 및 Windows 개발 PC 격리 회귀를 통과했다. 각 OS의 저장소/NCS 없는
+Clean-host 실기가 끝나기 전까지 Pre-release이며 최종 0.4.0으로 지원하지
+않는다.
+
 ## 지원 정책
 
 Platform 0.2.1/Tool 14.3.0-nu7은 지원 종료(EOL)됐으며 GitHub 배포와
@@ -130,6 +145,18 @@ Go, ARM GCC와 제품 소스 저장소가 없어야 한다. 외부 SWD `Burn Boo
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 .\Test-NuCleanPc.ps1 `
+    -Port 'COM10' `
+    -EnforceCleanHost
+```
+
+0.4.0 RC 시험은 Version과 Core/Tool 기대값을 함께 고정한다.
+
+```powershell
+.\Test-NuCleanPc.ps1 `
+    -IndexUrl 'https://raw.githubusercontent.com/EIDOSDATA/NUCODE_Arduino_Packages/main/rc/v0.4.0-rc.1/package_nucode_index.json' `
+    -PlatformVersion '0.4.0-rc.1' `
+    -ExpectedCoreVersion '0.90.0' `
+    -ExpectedToolVersion '14.3.0-nu10' `
     -Port 'COM10' `
     -EnforceCleanHost
 ```

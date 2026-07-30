@@ -1,0 +1,87 @@
+{
+  "packages": [
+    {
+      "name": "nucode",
+      "maintainer": "EIDOSDATA / NUCODE",
+      "websiteURL": "https://github.com/EIDOSDATA/NUCODE_Arduino_Packages",
+      "help": {
+        "online": "https://github.com/EIDOSDATA/NUCODE_Arduino_Packages/issues"
+      },
+      "platforms": [
+        {
+          "name": "NUCODE Zephyr Boards",
+          "architecture": "zephyr",
+          "version": "0.4.0-rc.1",
+          "category": "Contributed",
+          "help": {
+            "online": "https://github.com/EIDOSDATA/NUCODE_Arduino_Packages"
+          },
+          "url": "https://github.com/EIDOSDATA/NUCODE_Arduino_Packages/releases/download/v0.4.0-rc.1/nucode-zephyr-0.4.0-rc.1.zip",
+          "archiveFileName": "nucode-zephyr-0.4.0-rc.1.zip",
+          "checksum": "SHA-256:2A124B0C71A2D9A1698EBFAB45D3CBF8AECCE24F7984AFC0BC0F428EA30745A2",
+          "size": "16554497",
+          "boards": [
+            {
+              "name": "NU40-DK-Basic V2"
+            }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "nucode",
+              "name": "nu-zephyr-tools",
+              "version": "14.3.0-nu10"
+            }
+          ],
+          "discoveryDependencies": [
+            {
+              "packager": "builtin",
+              "name": "serial-discovery"
+            }
+          ],
+          "monitorDependencies": [
+            {
+              "packager": "builtin",
+              "name": "serial-monitor"
+            }
+          ]
+        }
+      ],
+      "tools": [
+        {
+          "name": "nu-zephyr-tools",
+          "version": "14.3.0-nu10",
+          "systems": [
+            {
+              "host": "x86_64-mingw32",
+              "url": "https://github.com/EIDOSDATA/NUCODE_Arduino_Packages/releases/download/v0.4.0-rc.1/nu-zephyr-tools-14.3.0-nu10-windows_amd64.zip",
+              "archiveFileName": "nu-zephyr-tools-14.3.0-nu10-windows_amd64.zip",
+              "checksum": "SHA-256:4008DBA2B1203C388861B3D5F7BBD4A4C70C094CFF20167DFDD1E5799204AB44",
+              "size": "70202068"
+            },
+            {
+              "host": "x86_64-pc-linux-gnu",
+              "url": "https://github.com/EIDOSDATA/NUCODE_Arduino_Packages/releases/download/v0.4.0-rc.1/nu-zephyr-tools-14.3.0-nu10-linux_amd64.tar.gz",
+              "archiveFileName": "nu-zephyr-tools-14.3.0-nu10-linux_amd64.tar.gz",
+              "checksum": "SHA-256:755DAC54A629BB6775DF5927BF09017281287CFDBAF244766A6B5DCD1EA6214C",
+              "size": "63263323"
+            },
+            {
+              "host": "aarch64-linux-gnu",
+              "url": "https://github.com/EIDOSDATA/NUCODE_Arduino_Packages/releases/download/v0.4.0-rc.1/nu-zephyr-tools-14.3.0-nu10-linux_arm64.tar.gz",
+              "archiveFileName": "nu-zephyr-tools-14.3.0-nu10-linux_arm64.tar.gz",
+              "checksum": "SHA-256:F2AD0B92C2F1D91C859118A691D26CC584FFE9DC8292B5D8C9DC7E7BC52516FF",
+              "size": "62331143"
+            },
+            {
+              "host": "arm64-apple-darwin",
+              "url": "https://github.com/EIDOSDATA/NUCODE_Arduino_Packages/releases/download/v0.4.0-rc.1/nu-zephyr-tools-14.3.0-nu10-macos_arm64.tar.gz",
+              "archiveFileName": "nu-zephyr-tools-14.3.0-nu10-macos_arm64.tar.gz",
+              "checksum": "SHA-256:C78CC5002C130705BEC1EFE00190A8EFFDDDF94AE42D04785D277D7759BB5BD1",
+              "size": "55365869"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

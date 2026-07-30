@@ -10,6 +10,13 @@ param(
     [ValidateNotNullOrEmpty()]
     [string]$IndexUrl = 'https://raw.githubusercontent.com/EIDOSDATA/NUCODE_Arduino_Packages/main/package_nucode_index.json',
 
+    [ValidatePattern('^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$')]
+    [string]$PlatformVersion = '0.3.1',
+
+    [string]$ExpectedCoreVersion = '',
+
+    [string]$ExpectedToolVersion = '',
+
     [ValidateNotNullOrEmpty()]
     [string]$ArduinoCli = 'C:\Program Files\Arduino IDE\resources\app\lib\backend\resources\arduino-cli.exe',
 
@@ -44,7 +51,7 @@ catch
 $global:OutputEncoding = $nuUtf8Encoding
 
 $fqbn = 'nucode:zephyr:nu40dk_v2'
-$platformVersion = '0.3.1'
+$platformVersion = $PlatformVersion
 
 if ($BuildId -eq 0)
 {
@@ -86,6 +93,8 @@ $servoSketchRoot = Join-Path $userRoot 'ServoApiSmoke'
 $servoBuildRoot = Join-Path $WorkRoot 'servo-build'
 $evidenceRoot = Join-Path $WorkRoot 'evidence'
 $evidencePath = Join-Path $evidenceRoot 'clean-pc-evidence.json'
+$installedPlatformRoot = Join-Path $dataRoot (
+    "packages\nucode\hardware\zephyr\$platformVersion")
 
 ## @brief 외부 개발 도구 설치 여부를 확인한다.
 function Test-NuExternalCommand
@@ -214,7 +223,7 @@ void loop()
 $servo = @'
 /**
  * @file ServoApiSmoke.ino
- * @brief Platform 0.3.1 Servo 공개 API의 Compile과 Link를 검사한다.
+ * @brief 설치된 Platform의 Servo 공개 API Compile과 Link를 검사한다.
  */
 
 #include <Servo.h>
@@ -254,6 +263,47 @@ $null = Invoke-NuArduinoCli -Arguments @(
     'core',
     'install',
     "nucode:zephyr@$platformVersion")
+
+if (-not (Test-Path -LiteralPath $installedPlatformRoot -PathType Container))
+{
+    throw "요청 Platform 설치 경로가 없습니다: $installedPlatformRoot"
+}
+
+if (-not [string]::IsNullOrWhiteSpace($ExpectedCoreVersion))
+{
+    $sbomPath = Join-Path $installedPlatformRoot 'sbom.cdx.json'
+
+    if (-not (Test-Path -LiteralPath $sbomPath -PathType Leaf))
+    {
+        throw "설치 Platform SBOM이 없습니다: $sbomPath"
+    }
+
+    $sbom = Get-Content -Raw -LiteralPath $sbomPath | ConvertFrom-Json
+    $coreComponents = @(
+        $sbom.components |
+            Where-Object { [string]$_.name -eq 'ArduinoCore-Zephyr' }
+    )
+
+    if (($coreComponents.Count -ne 1) -or
+        ([string]$coreComponents[0].version -ne $ExpectedCoreVersion))
+    {
+        throw (
+            '설치 ArduinoCore-Zephyr Version이 기대값과 다릅니다: ' +
+            "expected=$ExpectedCoreVersion")
+    }
+}
+
+if (-not [string]::IsNullOrWhiteSpace($ExpectedToolVersion))
+{
+    $installedToolRoot = Join-Path $dataRoot (
+        "packages\nucode\tools\nu-zephyr-tools\$ExpectedToolVersion")
+
+    if (-not (Test-Path -LiteralPath $installedToolRoot -PathType Container))
+    {
+        throw "요청 Host Tool 설치 경로가 없습니다: $installedToolRoot"
+    }
+}
+
 $boardList = Invoke-NuArduinoCli -Arguments @(
     'board',
     'listall',
@@ -317,7 +367,7 @@ if (($servoCompileOutput -notmatch '(?i)Servo') -or
     (-not (Test-Path -LiteralPath (
         Join-Path $servoBuildRoot 'ServoApiSmoke.ino.uf2') -PathType Leaf)))
 {
-    throw 'Platform 0.3.1 Servo Compile/Link/UF2를 확인하지 못했습니다.'
+    throw "Platform $platformVersion Servo Compile/Link/UF2를 확인하지 못했습니다."
 }
 
 $uploadExecuted = -not [string]::IsNullOrWhiteSpace($Port)
@@ -402,6 +452,8 @@ $evidence = [ordered]@{
     index_url = $IndexUrl
     fqbn = $fqbn
     platform_version = $platformVersion
+    expected_core_version = $ExpectedCoreVersion
+    expected_tool_version = $ExpectedToolVersion
     requested_build_id = $BuildId
     host_checks = $hostChecks
     serial_discovery_matched = $serialDiscoveryMatched
