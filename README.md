@@ -16,52 +16,50 @@ https://raw.githubusercontent.com/EIDOSDATA/NUCODE_Arduino_Packages/main/package
 Boards Manager에서 `NUCODE Zephyr Boards`를 검색해 설치한 뒤
 `NU40-DK-Basic V2`를 선택한다.
 
-## Platform 0.3.1 RC 시험
+## 지원 Host
 
-Linux amd64/arm64와 macOS Apple Silicon arm64 실기 전용 RC Index는 다음과
-같다. macOS Intel x86-64는 지원 대상이 아니다.
+- Windows x86-64
+- Linux x86-64
+- Linux arm64
+- macOS Apple Silicon arm64
 
-```text
-https://raw.githubusercontent.com/EIDOSDATA/NUCODE_Arduino_Packages/main/package_nucode_index_0.3.1-rc1.json
-```
-
-RC는 GitHub `v0.3.1-rc1` Pre-release 자산을 사용한다. Linux/macOS 실제
-NU40 시험이 끝나기 전에는 일반 사용자 설치 URL인
-`package_nucode_index.json`을 RC로 변경하지 않는다.
-
-macOS/Linux의 빈 Arduino Data/User 경로에서 설치·Compile·Upload를
-자동 검사하려면 다음 스크립트를 사용한다.
+macOS Intel x86-64는 지원하지 않는다. macOS/Linux의 빈 Arduino Data/User
+경로에서 설치·Compile·Upload를 자동 검사하려면 다음 스크립트를 사용한다.
 
 ```bash
 bash Test-NuUnixCleanHost.sh \
-  --index-url https://raw.githubusercontent.com/EIDOSDATA/NUCODE_Arduino_Packages/main/package_nucode_index_0.3.1-rc1.json \
+  --index-url https://raw.githubusercontent.com/EIDOSDATA/NUCODE_Arduino_Packages/main/package_nucode_index.json \
   --port /dev/cu.usbmodemNU40
 ```
 
 Linux에서는 `--port /dev/ttyACM0`처럼 실제 CDC 장치 경로를 지정한다.
 `--port`를 생략하면 실제 보드 없이 여섯 Sketch의 격리 설치·Compile까지만
-검사한다. 자세한 변경점과 남은 Gate는
-[0.3.1 RC1 Release Notes](RELEASE_NOTES_v0.3.1-rc1.md)에 정리되어 있다.
-게시와 OS별 시험 순서는
-[0.3.1 RC1 Test Guide](TEST_GUIDE_v0.3.1-rc1.md)를 따른다.
+검사한다.
 
 ## 현재 공개 Release
 
 | 항목 | 값 |
 |---|---|
-| Release Tag | `v0.3.0` |
-| Platform | `nucode:zephyr` 0.3.0 |
-| Windows Tool | `nu-zephyr-tools` 14.3.0-nu8 |
-| 지원 Host | Windows x86-64 |
+| Release Tag | `v0.3.1` |
+| Platform | `nucode:zephyr` 0.3.1 |
+| Host Tool | `nu-zephyr-tools` 14.3.0-nu9 |
+| 지원 Host | Windows x86-64, Linux x86-64/arm64, macOS arm64 |
 | 지원 Board | NU40-DK-Basic V2 |
 
-Board Manager Index는 현재 지원 Version인 0.3.0과 nu8만 제공한다. 이전 개발
+Board Manager Index는 현재 지원 Version인 0.3.1과 nu9만 제공한다. 이전 개발
 Version은 Index에 누적하지 않는다.
 
-## v0.3.0 내용
+## 지원 정책
 
-0.3.0은 Loader ABI 0.3과 356 KiB Sketch 계약, Servo 1.3.0과 Arduino IDE
-진행률·증분 Build를 포함한다.
+Platform 0.2.1/Tool 14.3.0-nu7은 지원 종료(EOL)됐으며 GitHub 배포와
+Board Manager Index에서 제거했다. 신규 설치, 재배포, 결함 수정과 사용자
+지원을 제공하지 않는다. Loader ABI 0.2인 0.2.1은 현재 ABI 0.3
+Loader/Platform과 호환되지 않는다.
+
+## v0.3.1 내용
+
+0.3.1은 0.3.0의 Loader ABI 0.3과 356 KiB Sketch 계약, Servo 1.3.0과
+Arduino IDE 진행률·증분 Build를 유지하면서 Linux와 macOS를 지원한다.
 
 - Arduino IDE Native USB Serial Monitor DTR 기본값 `on`
 - Build Terminal 진행률 5~100%, Upload 진행률 2~100%
@@ -82,13 +80,13 @@ Version은 Index에 누적하지 않는다.
 MCUboot는 사용하지 않는다. Loader 최초 설치와 손상 복구는 SWD로 수행하고,
 일반 Arduino Sketch Upload는 Native USB MSC/UF2로 처리한다.
 
-Pairing/SMP/LTK와 암호화 BLE 연결은 0.3.0에서 지원하지 않는다. Arduino IDE가
+Pairing/SMP/LTK와 암호화 BLE 연결은 0.3.1에서 지원하지 않는다. Arduino IDE가
 FQBN/COM별 `dtr=off`를 저장한 경우 IDE를 종료하고 설치된
 `tools/Repair-NuArduinoSerialMonitor.ps1`을 한 번 실행해야 한다.
 
 Platform Archive에는 Arduino Core/API, NU40 Variant, Loader EDK와
 `boards.txt`/`platform.txt`/`programmers.txt`가 포함된다. Windows Tool
-Archive에는 ARM Zephyr GCC와 SWD Provisioning용 `nu-tool`이 포함된다.
+Host별 Tool Archive에는 ARM Zephyr GCC와 공통 `nu-tool`이 포함된다.
 일반 `.ino` Compile과 Native USB MSC/UF2 Upload에는 NCS, Zephyr SDK, Go 또는
 별도 ARM GCC를 설치하지 않는다.
 
@@ -107,22 +105,20 @@ Upload는 SWD가 아니라 Native USB MSC/UF2 경로를 사용한다.
 
 ## 배포 자산
 
-GitHub `v0.3.0` Release에는 다음 네 파일을 제공한다.
+GitHub `v0.3.1` Release에는 다음 일곱 파일을 제공한다.
 
 ```text
-nucode-zephyr-0.3.0.zip
-nu-zephyr-tools-14.3.0-nu8-windows_amd64.zip
+nucode-zephyr-0.3.1.zip
+nu-zephyr-tools-14.3.0-nu9-windows_amd64.zip
+nu-zephyr-tools-14.3.0-nu9-linux_amd64.tar.gz
+nu-zephyr-tools-14.3.0-nu9-linux_arm64.tar.gz
+nu-zephyr-tools-14.3.0-nu9-macos_arm64.tar.gz
 release-manifest.json
 SHA256SUMS.txt
 ```
 
-대용량 ZIP은 Git 이력에 Commit하지 않는다. `release-assets/v0.3.0`은
+대용량 Archive는 Git 이력에 Commit하지 않는다. `release-assets/v0.3.1`은
 `.gitignore` 대상이며 GitHub Release에만 업로드한다.
-
-0.3.1 RC1도 같은 방식으로 `release-assets/v0.3.1-rc1`의 Archive,
-`release-manifest.json`, `SHA256SUMS.txt`를 GitHub `v0.3.1-rc1`
-Pre-release에 직접 업로드한다. 이 디렉터리가 GitHub Desktop 변경 목록에
-표시되지 않는 것은 의도된 동작이다.
 
 ## 별도 Windows Clean PC 시험
 

@@ -31,11 +31,11 @@ Options:
 
 Examples:
   bash Test-NuUnixCleanHost.sh \
-    --index-url https://raw.githubusercontent.com/EIDOSDATA/NUCODE_Arduino_Packages/main/package_nucode_index_0.3.1-rc1.json \
+    --index-url https://raw.githubusercontent.com/EIDOSDATA/NUCODE_Arduino_Packages/main/package_nucode_index.json \
     --port /dev/ttyACM0
 
   bash Test-NuUnixCleanHost.sh \
-    --index-url https://raw.githubusercontent.com/EIDOSDATA/NUCODE_Arduino_Packages/main/package_nucode_index_0.3.1-rc1.json \
+    --index-url https://raw.githubusercontent.com/EIDOSDATA/NUCODE_Arduino_Packages/main/package_nucode_index.json \
     --port /dev/cu.usbmodemNU40
 EOF
 }

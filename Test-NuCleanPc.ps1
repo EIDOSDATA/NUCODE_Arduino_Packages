@@ -44,7 +44,7 @@ catch
 $global:OutputEncoding = $nuUtf8Encoding
 
 $fqbn = 'nucode:zephyr:nu40dk_v2'
-$platformVersion = '0.3.0'
+$platformVersion = '0.3.1'
 
 if ($BuildId -eq 0)
 {
@@ -214,7 +214,7 @@ void loop()
 $servo = @'
 /**
  * @file ServoApiSmoke.ino
- * @brief Platform 0.3.0 Servo 공개 API의 Compile과 Link를 검사한다.
+ * @brief Platform 0.3.1 Servo 공개 API의 Compile과 Link를 검사한다.
  */
 
 #include <Servo.h>
@@ -317,7 +317,7 @@ if (($servoCompileOutput -notmatch '(?i)Servo') -or
     (-not (Test-Path -LiteralPath (
         Join-Path $servoBuildRoot 'ServoApiSmoke.ino.uf2') -PathType Leaf)))
 {
-    throw 'Platform 0.3.0 Servo Compile/Link/UF2를 확인하지 못했습니다.'
+    throw 'Platform 0.3.1 Servo Compile/Link/UF2를 확인하지 못했습니다.'
 }
 
 $uploadExecuted = -not [string]::IsNullOrWhiteSpace($Port)
