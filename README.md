@@ -16,6 +16,35 @@ https://raw.githubusercontent.com/EIDOSDATA/NUCODE_Arduino_Packages/main/package
 Boards Manager에서 `NUCODE Zephyr Boards`를 검색해 설치한 뒤
 `NU40-DK-Basic V2`를 선택한다.
 
+## Platform 0.3.1 RC 시험
+
+Linux amd64/arm64와 macOS Apple Silicon arm64 실기 전용 RC Index는 다음과
+같다. macOS Intel x86-64는 지원 대상이 아니다.
+
+```text
+https://raw.githubusercontent.com/EIDOSDATA/NUCODE_Arduino_Packages/main/package_nucode_index_0.3.1-rc1.json
+```
+
+RC는 GitHub `v0.3.1-rc1` Pre-release 자산을 사용한다. Linux/macOS 실제
+NU40 시험이 끝나기 전에는 일반 사용자 설치 URL인
+`package_nucode_index.json`을 RC로 변경하지 않는다.
+
+macOS/Linux의 빈 Arduino Data/User 경로에서 설치·Compile·Upload를
+자동 검사하려면 다음 스크립트를 사용한다.
+
+```bash
+bash Test-NuUnixCleanHost.sh \
+  --index-url https://raw.githubusercontent.com/EIDOSDATA/NUCODE_Arduino_Packages/main/package_nucode_index_0.3.1-rc1.json \
+  --port /dev/cu.usbmodemNU40
+```
+
+Linux에서는 `--port /dev/ttyACM0`처럼 실제 CDC 장치 경로를 지정한다.
+`--port`를 생략하면 실제 보드 없이 여섯 Sketch의 격리 설치·Compile까지만
+검사한다. 자세한 변경점과 남은 Gate는
+[0.3.1 RC1 Release Notes](RELEASE_NOTES_v0.3.1-rc1.md)에 정리되어 있다.
+게시와 OS별 시험 순서는
+[0.3.1 RC1 Test Guide](TEST_GUIDE_v0.3.1-rc1.md)를 따른다.
+
 ## 현재 공개 Release
 
 | 항목 | 값 |
@@ -89,6 +118,11 @@ SHA256SUMS.txt
 
 대용량 ZIP은 Git 이력에 Commit하지 않는다. `release-assets/v0.3.0`은
 `.gitignore` 대상이며 GitHub Release에만 업로드한다.
+
+0.3.1 RC1도 같은 방식으로 `release-assets/v0.3.1-rc1`의 Archive,
+`release-manifest.json`, `SHA256SUMS.txt`를 GitHub `v0.3.1-rc1`
+Pre-release에 직접 업로드한다. 이 디렉터리가 GitHub Desktop 변경 목록에
+표시되지 않는 것은 의도된 동작이다.
 
 ## 별도 Windows Clean PC 시험
 
