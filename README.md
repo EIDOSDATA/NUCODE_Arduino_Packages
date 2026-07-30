@@ -40,47 +40,46 @@ Linux에서는 `--port /dev/ttyACM0`처럼 실제 CDC 장치 경로를 지정한
 
 | 항목 | 값 |
 |---|---|
-| Release Tag | `v0.3.1` |
-| Platform | `nucode:zephyr` 0.3.1 |
-| Host Tool | `nu-zephyr-tools` 14.3.0-nu9 |
+| Release Tag | `v0.4.0` |
+| Platform | `nucode:zephyr` 0.4.0 |
+| Host Tool | `nu-zephyr-tools` 14.3.0-nu11 |
 | 지원 Host | Windows x86-64, Linux x86-64/arm64, macOS arm64 |
 | 지원 Board | NU40-DK-Basic V2 |
 
-Board Manager Index는 현재 지원 Version인 0.3.1과 nu9만 제공한다. 이전 개발
+Board Manager Index는 현재 지원 Version인 0.4.0과 nu11만 제공한다. 이전 개발
 Version은 Index에 누적하지 않는다.
 
-## Platform 0.4.0 Release Candidate 시험
+## Platform 0.4.0 정식 배포
 
-ArduinoCore-Zephyr 0.90.0/Loader ABI 0.4 통합 후보는 안정판 Index와 분리된
-`0.4.0-rc.1`/Tool `14.3.0-nu10`으로 시험한다. 일반 사용자는 이 RC를
-설치하지 않는다. 시험 전용 Additional Boards Manager URL은 다음과 같다.
+ArduinoCore-Zephyr 0.90.0/Loader ABI 0.4의 `0.4.0-rc.1`은 Windows x86-64,
+Linux x86-64/arm64와 macOS Apple Silicon arm64의 Clean-host
+Install→Compile→실기 Upload→Serial 시험을 모두 통과했다.
 
-```text
-https://raw.githubusercontent.com/EIDOSDATA/NUCODE_Arduino_Packages/main/rc/v0.4.0-rc.1/package_nucode_index.json
-```
-
-이 RC는 Windows x86-64, Linux x86-64/arm64와 macOS arm64 Archive 정적
-검증 및 Windows 개발 PC 격리 회귀를 통과했다. 각 OS의 저장소/NCS 없는
-Clean-host 실기가 끝나기 전까지 Pre-release이며 최종 0.4.0으로 지원하지
-않는다.
+RC1에서 정식 Platform `0.4.0`/Tool `14.3.0-nu11`로 승격하는 동안 Core,
+Loader, Sketch, Package와 Host Tool Source의 기능 변경은 없다. 최종
+Archive는 정적 무결성 Gate와 Windows 격리 설치·Blink/Servo Compile·COM
+매칭·UF2 Upload·Activation·CDC Serial 시험을 통과해 일반 Release로
+승인됐다. GitHub `v0.4.0` 일반/latest Release와 Root Board Manager Index를
+공개했으며, 공개 Index를 통한 설치·Compile·Upload·Serial 확인도 통과했다.
 
 ## 지원 정책
 
 Platform 0.2.1/Tool 14.3.0-nu7은 지원 종료(EOL)됐으며 GitHub 배포와
 Board Manager Index에서 제거했다. 신규 설치, 재배포, 결함 수정과 사용자
-지원을 제공하지 않는다. Loader ABI 0.2인 0.2.1은 현재 ABI 0.3
+지원을 제공하지 않는다. Loader ABI 0.2인 0.2.1은 현재 ABI 0.4
 Loader/Platform과 호환되지 않는다.
 
-## v0.3.1 내용
+## v0.4.0 내용
 
-0.3.1은 0.3.0의 Loader ABI 0.3과 356 KiB Sketch 계약, Servo 1.3.0과
-Arduino IDE 진행률·증분 Build를 유지하면서 Linux와 macOS를 지원한다.
+0.4.0은 ArduinoCore-Zephyr 0.90.0과 Loader ABI 0.4를 사용하고 356 KiB
+Sketch 계약, Servo 1.3.0, Arduino IDE 진행률·증분 Build와 네 Host 지원을
+유지한다.
 
 - Arduino IDE Native USB Serial Monitor DTR 기본값 `on`
 - Build Terminal 진행률 5~100%, Upload 진행률 2~100%
 - MMD Object/Artifact Cache 기반 증분 Build
-- Loader ABI 0.3/Export 447개
-- Loader ABI Fingerprint `518241...D2E1`
+- Loader ABI 0.4/Export 450개
+- Loader ABI Fingerprint `FC8E6F...EC44E7`
 - `user_sketch`와 `sketch_staging` 각 356 KiB
 - 128 KiB LLEXT Heap
 - Arduino Sketch Stack 16 KiB
@@ -95,7 +94,8 @@ Arduino IDE 진행률·증분 Build를 유지하면서 Linux와 macOS를 지원�
 MCUboot는 사용하지 않는다. Loader 최초 설치와 손상 복구는 SWD로 수행하고,
 일반 Arduino Sketch Upload는 Native USB MSC/UF2로 처리한다.
 
-Pairing/SMP/LTK와 암호화 BLE 연결은 0.3.1에서 지원하지 않는다. Arduino IDE가
+PDM, RTC, Pairing/SMP/LTK와 암호화 BLE 연결은 0.4.0에서 지원하지 않는다.
+Arduino IDE가
 FQBN/COM별 `dtr=off`를 저장한 경우 IDE를 종료하고 설치된
 `tools/Repair-NuArduinoSerialMonitor.ps1`을 한 번 실행해야 한다.
 
@@ -120,19 +120,19 @@ Upload는 SWD가 아니라 Native USB MSC/UF2 경로를 사용한다.
 
 ## 배포 자산
 
-GitHub `v0.3.1` Release에는 다음 일곱 파일을 제공한다.
+GitHub `v0.4.0` Release에는 다음 일곱 파일을 제공한다.
 
 ```text
-nucode-zephyr-0.3.1.zip
-nu-zephyr-tools-14.3.0-nu9-windows_amd64.zip
-nu-zephyr-tools-14.3.0-nu9-linux_amd64.tar.gz
-nu-zephyr-tools-14.3.0-nu9-linux_arm64.tar.gz
-nu-zephyr-tools-14.3.0-nu9-macos_arm64.tar.gz
+nucode-zephyr-0.4.0.zip
+nu-zephyr-tools-14.3.0-nu11-windows_amd64.zip
+nu-zephyr-tools-14.3.0-nu11-linux_amd64.tar.gz
+nu-zephyr-tools-14.3.0-nu11-linux_arm64.tar.gz
+nu-zephyr-tools-14.3.0-nu11-macos_arm64.tar.gz
 release-manifest.json
 SHA256SUMS.txt
 ```
 
-대용량 Archive는 Git 이력에 Commit하지 않는다. `release-assets/v0.3.1`은
+대용량 Archive는 Git 이력에 Commit하지 않는다. `release-assets/v0.4.0`은
 `.gitignore` 대상이며 GitHub Release에만 업로드한다.
 
 ## 별도 Windows Clean PC 시험
@@ -149,14 +149,14 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
     -EnforceCleanHost
 ```
 
-0.4.0 RC 시험은 Version과 Core/Tool 기대값을 함께 고정한다.
+0.4.0 공개 회귀는 Version과 Core/Tool 기대값을 함께 고정한다.
 
 ```powershell
 .\Test-NuCleanPc.ps1 `
-    -IndexUrl 'https://raw.githubusercontent.com/EIDOSDATA/NUCODE_Arduino_Packages/main/rc/v0.4.0-rc.1/package_nucode_index.json' `
-    -PlatformVersion '0.4.0-rc.1' `
+    -IndexUrl 'https://raw.githubusercontent.com/EIDOSDATA/NUCODE_Arduino_Packages/main/package_nucode_index.json' `
+    -PlatformVersion '0.4.0' `
     -ExpectedCoreVersion '0.90.0' `
-    -ExpectedToolVersion '14.3.0-nu10' `
+    -ExpectedToolVersion '14.3.0-nu11' `
     -Port 'COM10' `
     -EnforceCleanHost
 ```

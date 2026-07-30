@@ -8,20 +8,21 @@
 release-assets/
 ├─ v0.3.1/
 │  └─ 공개 안정판 자산
-└─ v0.4.0-rc.1/
-   ├─ nucode-zephyr-0.4.0-rc.1.zip
-   ├─ nu-zephyr-tools-14.3.0-nu10-windows_amd64.zip
-   ├─ nu-zephyr-tools-14.3.0-nu10-linux_amd64.tar.gz
-   ├─ nu-zephyr-tools-14.3.0-nu10-linux_arm64.tar.gz
-   ├─ nu-zephyr-tools-14.3.0-nu10-macos_arm64.tar.gz
+├─ v0.4.0-rc.1/
+│  └─ 공개 검증을 마친 Release Candidate 자산
+└─ v0.4.0/
+   ├─ nucode-zephyr-0.4.0.zip
+   ├─ nu-zephyr-tools-14.3.0-nu11-windows_amd64.zip
+   ├─ nu-zephyr-tools-14.3.0-nu11-linux_amd64.tar.gz
+   ├─ nu-zephyr-tools-14.3.0-nu11-linux_arm64.tar.gz
+   ├─ nu-zephyr-tools-14.3.0-nu11-macos_arm64.tar.gz
    ├─ release-manifest.json
    └─ SHA256SUMS.txt
 ```
 
-0.4.0 RC Release 제목은 `NUCODE Zephyr Boards 0.4.0-rc.1`, Tag는 정확히
-`v0.4.0-rc.1`을 사용하고 GitHub의 **Pre-release**로 게시한다. 외부
-Multi-host Clean-host Gate 전에는 일반 Release 또는 최종 0.4.0으로
-승격하지 않는다.
+0.4.0 Release 제목은 `NUCODE Zephyr Boards 0.4.0`, Tag는 정확히
+`v0.4.0`을 사용한다. RC1에서 네 Host Clean-host Gate를 완료했으므로
+Draft/Pre-release가 아닌 일반 Release로 게시한다.
 
 과거 안정판 자산 구성은 다음과 같다.
 
