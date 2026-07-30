@@ -20,6 +20,9 @@ param(
     [ValidateRange(0, 4294967295)]
     [uint32]$BuildId = 0,
 
+    [ValidateRange(5, 120)]
+    [int]$SerialTimeoutSeconds = 20,
+
     [switch]$EnforceCleanHost
 )
 
@@ -41,7 +44,7 @@ catch
 $global:OutputEncoding = $nuUtf8Encoding
 
 $fqbn = 'nucode:zephyr:nu40dk_v2'
-$platformVersion = '0.2.1'
+$platformVersion = '0.3.0'
 
 if ($BuildId -eq 0)
 {
@@ -79,6 +82,8 @@ $downloadsRoot = Join-Path $WorkRoot 'downloads'
 $userRoot = Join-Path $WorkRoot 'user'
 $sketchRoot = Join-Path $userRoot 'Blink'
 $buildRoot = Join-Path $WorkRoot 'build'
+$servoSketchRoot = Join-Path $userRoot 'ServoApiSmoke'
+$servoBuildRoot = Join-Path $WorkRoot 'servo-build'
 $evidenceRoot = Join-Path $WorkRoot 'evidence'
 $evidencePath = Join-Path $evidenceRoot 'clean-pc-evidence.json'
 
@@ -157,7 +162,8 @@ if (Test-Path -LiteralPath $WorkRoot)
 }
 
 New-Item -ItemType Directory `
-    -Path $dataRoot, $downloadsRoot, $userRoot, $sketchRoot, $evidenceRoot `
+    -Path $dataRoot, $downloadsRoot, $userRoot, $sketchRoot, `
+        $servoSketchRoot, $evidenceRoot `
     -Force | Out-Null
 
 $yaml = @"
@@ -176,23 +182,71 @@ logging:
     $yaml,
     [System.Text.UTF8Encoding]::new($false))
 
-$blink = @'
+$blink = @"
+/**
+ * @file Blink.ino
+ * @brief NU40 내장 LED와 Native USB CDC를 함께 검증한다.
+ */
+
+/** @brief LED와 Native USB Serial을 초기화한다. */
 void setup()
 {
+    Serial.begin(115200);
     pinMode(LED_BUILTIN, OUTPUT);
+    digitalWrite(LED_BUILTIN, LED_STATE_OFF);
 }
 
+/** @brief LED를 전환하며 Clean-PC 식별 문자열을 1초마다 출력한다. */
 void loop()
 {
-    digitalWrite(LED_BUILTIN, HIGH);
+    digitalWrite(LED_BUILTIN, LED_STATE_ON);
+    Serial.println("NUCODE CLEAN-PC HELLO $BuildId");
     delay(1000);
-    digitalWrite(LED_BUILTIN, LOW);
+    digitalWrite(LED_BUILTIN, LED_STATE_OFF);
+    delay(1000);
+}
+"@
+[System.IO.File]::WriteAllText(
+    (Join-Path $sketchRoot 'Blink.ino'),
+    $blink,
+    [System.Text.UTF8Encoding]::new($false))
+
+$servo = @'
+/**
+ * @file ServoApiSmoke.ino
+ * @brief Platform 0.3.0 Servo 공개 API의 Compile과 Link를 검사한다.
+ */
+
+#include <Servo.h>
+
+Servo servo;
+
+/** @brief Servo 채널을 연결하고 주요 공개 API를 호출한다. */
+void setup()
+{
+    Serial.begin(115200);
+
+    const uint8_t channel = servo.attach(D2);
+    if (channel == INVALID_SERVO)
+    {
+        Serial.println("SERVO ATTACH FAILED");
+        return;
+    }
+
+    servo.write(90);
+    servo.writeMicroseconds(1000);
+    servo.detach();
+}
+
+/** @brief Compile 시험용 유휴 Loop를 유지한다. */
+void loop()
+{
     delay(1000);
 }
 '@
 [System.IO.File]::WriteAllText(
-    (Join-Path $sketchRoot 'Blink.ino'),
-    $blink,
+    (Join-Path $servoSketchRoot 'ServoApiSmoke.ino'),
+    $servo,
     [System.Text.UTF8Encoding]::new($false))
 
 $null = Invoke-NuArduinoCli -Arguments @('core', 'update-index')
@@ -249,7 +303,26 @@ if ($uf2Files.Count -ne 1)
     throw "Export된 UF2가 정확히 하나가 아닙니다: $($uf2Files.Count)"
 }
 
+$servoCompileOutput = Invoke-NuArduinoCli -Arguments @(
+    'compile',
+    '--fqbn',
+    $fqbn,
+    '--build-path',
+    $servoBuildRoot,
+    '--clean',
+    '--verbose',
+    $servoSketchRoot)
+
+if (($servoCompileOutput -notmatch '(?i)Servo') -or
+    (-not (Test-Path -LiteralPath (
+        Join-Path $servoBuildRoot 'ServoApiSmoke.ino.uf2') -PathType Leaf)))
+{
+    throw 'Platform 0.3.0 Servo Compile/Link/UF2를 확인하지 못했습니다.'
+}
+
 $uploadExecuted = -not [string]::IsNullOrWhiteSpace($Port)
+$serialOutputMatched = $false
+$serialLineCount = 0
 
 if ($uploadExecuted)
 {
@@ -262,6 +335,62 @@ if ($uploadExecuted)
         '--build-path',
         $buildRoot,
         '--verbose')
+
+    $serialPort = [System.IO.Ports.SerialPort]::new(
+        $Port,
+        115200,
+        [System.IO.Ports.Parity]::None,
+        8,
+        [System.IO.Ports.StopBits]::One)
+    $serialPort.ReadTimeout = 1000
+    $serialPort.DtrEnable = $true
+    $serialPort.RtsEnable = $true
+
+    try
+    {
+        $serialPort.Open()
+        $deadline = (Get-Date).AddSeconds($SerialTimeoutSeconds)
+        $expectedSerialLine = "NUCODE CLEAN-PC HELLO $BuildId"
+
+        while ((Get-Date) -lt $deadline)
+        {
+            try
+            {
+                $line = $serialPort.ReadLine().Trim()
+                if (-not [string]::IsNullOrWhiteSpace($line))
+                {
+                    Write-Host "[SERIAL] $line"
+                    $serialLineCount++
+
+                    if ($line -eq $expectedSerialLine)
+                    {
+                        $serialOutputMatched = $true
+                        break
+                    }
+                }
+            }
+            catch [System.TimeoutException]
+            {
+                ## @note 제한 시간까지 다음 CDC Line을 계속 기다린다.
+            }
+        }
+    }
+    finally
+    {
+        if ($serialPort.IsOpen)
+        {
+            $serialPort.Close()
+        }
+
+        $serialPort.Dispose()
+    }
+
+    if (-not $serialOutputMatched)
+    {
+        throw (
+            'Upload 뒤 Native USB Serial 식별 문자열을 확인하지 못했습니다: ' +
+            "port=$Port timeout=$SerialTimeoutSeconds")
+    }
 }
 
 $evidence = [ordered]@{
@@ -280,9 +409,13 @@ $evidence = [ordered]@{
     uf2_sha256 = (Get-FileHash `
         -Algorithm SHA256 `
         -LiteralPath $uf2Files[0].FullName).Hash
+    servo_compile_passed = $true
+    servo_uf2 = Join-Path $servoBuildRoot 'ServoApiSmoke.ino.uf2'
     forbidden_development_path_found = $false
     upload_executed = $uploadExecuted
     upload_port = $Port
+    serial_output_matched = $serialOutputMatched
+    serial_line_count = $serialLineCount
 }
 $evidenceJson = $evidence | ConvertTo-Json -Depth 8
 [System.IO.File]::WriteAllText(
@@ -296,4 +429,6 @@ Write-Host 'NUCODE Windows Clean-PC Board Manager 시험 통과' `
 Write-Host "FQBN     : $fqbn"
 Write-Host "Discovery: $serialDiscoveryMatched"
 Write-Host "UF2      : $($uf2Files[0].FullName)"
+Write-Host 'Servo     : Compile/Link/UF2 PASS'
+Write-Host "Serial    : $serialOutputMatched"
 Write-Host "Evidence : $evidencePath"

@@ -20,23 +20,26 @@ Boards Manager에서 `NUCODE Zephyr Boards`를 검색해 설치한 뒤
 
 | 항목 | 값 |
 |---|---|
-| Release Tag | `v0.2.1` |
-| Platform | `nucode:zephyr` 0.2.1 |
-| Windows Tool | `nu-zephyr-tools` 14.3.0-nu7 |
+| Release Tag | `v0.3.0` |
+| Platform | `nucode:zephyr` 0.3.0 |
+| Windows Tool | `nu-zephyr-tools` 14.3.0-nu8 |
 | 지원 Host | Windows x86-64 |
 | 지원 Board | NU40-DK-Basic V2 |
 
-Board Manager Index는 현재 지원 Version인 0.2.1과 nu7만 제공한다. 이전 개발
+Board Manager Index는 현재 지원 Version인 0.3.0과 nu8만 제공한다. 이전 개발
 Version은 Index에 누적하지 않는다.
 
-## v0.2.1 내용
+## v0.3.0 내용
 
-0.2.1은 0.2.0 기능을 유지하면서 월요일 데모 안정화 설정을 추가한다.
+0.3.0은 Loader ABI 0.3과 356 KiB Sketch 계약, Servo 1.3.0과 Arduino IDE
+진행률·증분 Build를 포함한다.
 
 - Arduino IDE Native USB Serial Monitor DTR 기본값 `on`
-- Loader ABI 0.2/Export 406개
-- Loader ABI Fingerprint `A5724F...18002`
-- `user_sketch`와 `sketch_staging` 각 192 KiB
+- Build Terminal 진행률 5~100%, Upload 진행률 2~100%
+- MMD Object/Artifact Cache 기반 증분 Build
+- Loader ABI 0.3/Export 447개
+- Loader ABI Fingerprint `518241...D2E1`
+- `user_sketch`와 `sketch_staging` 각 356 KiB
 - 128 KiB LLEXT Heap
 - Arduino Sketch Stack 16 KiB
 - General Heap 16 KiB
@@ -44,11 +47,13 @@ Version은 Index에 누적하지 않는다.
 - Supervisor Preemptive Priority 14
 - WDT/Reset Reason/Retention Counter 기반 자동 Fault-loop Recovery
 - ArduinoBLE/NUBleUart 비암호화 Peripheral/NUS
+- Servo 1.3.0
+- MSC `INDEX.HTM`의 [NUWORKS](https://nuworks.io/en) 홈페이지 연결
 
 MCUboot는 사용하지 않는다. Loader 최초 설치와 손상 복구는 SWD로 수행하고,
 일반 Arduino Sketch Upload는 Native USB MSC/UF2로 처리한다.
 
-Pairing/SMP/LTK와 암호화 BLE 연결은 0.2.1에서 지원하지 않는다. Arduino IDE가
+Pairing/SMP/LTK와 암호화 BLE 연결은 0.3.0에서 지원하지 않는다. Arduino IDE가
 FQBN/COM별 `dtr=off`를 저장한 경우 IDE를 종료하고 설치된
 `tools/Repair-NuArduinoSerialMonitor.ps1`을 한 번 실행해야 한다.
 
@@ -73,16 +78,16 @@ Upload는 SWD가 아니라 Native USB MSC/UF2 경로를 사용한다.
 
 ## 배포 자산
 
-GitHub `v0.2.1` Release에는 다음 네 파일을 제공한다.
+GitHub `v0.3.0` Release에는 다음 네 파일을 제공한다.
 
 ```text
-nucode-zephyr-0.2.1.zip
-nu-zephyr-tools-14.3.0-nu7-windows_amd64.zip
+nucode-zephyr-0.3.0.zip
+nu-zephyr-tools-14.3.0-nu8-windows_amd64.zip
 release-manifest.json
 SHA256SUMS.txt
 ```
 
-대용량 ZIP은 Git 이력에 Commit하지 않는다. `release-assets/v0.2.1`은
+대용량 ZIP은 Git 이력에 Commit하지 않는다. `release-assets/v0.3.0`은
 `.gitignore` 대상이며 GitHub Release에만 업로드한다.
 
 ## 별도 Windows Clean PC 시험
@@ -111,8 +116,10 @@ Unix Time을 사용해 기존 Sketch와 다른 실제 Activation을 유도한다
 - `nucode:zephyr:nu40dk_v2` FQBN
 - Serial Discovery
 - Blink Compile과 UF2 Export
+- Servo Compile·Link와 UF2 Export
 - NCS/제품 저장소 경로 비참조
 - 선택 Port의 Native USB MSC/UF2 Upload
+- Upload 후 DTR Native USB Serial 출력
 
 증거는 `%TEMP%\NUCODE-Clean\evidence\clean-pc-evidence.json`에
 기록된다.
