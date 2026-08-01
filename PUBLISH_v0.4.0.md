@@ -1,5 +1,8 @@
 # Platform 0.4.0 GitHub 게시 절차
 
+> 역사 기록: 이 문서는 0.4.0 당시 수동 정식 게시 절차다. 신규 Version에서는
+> Pre-release Asset을 교체하지 않고 HIL 승인 후 자동 승격한다.
+
 ## 1. Release 준비 Text 변경 Push
 
 GitHub Desktop에서 다음 추적 파일을 Commit하고 `main`에 Push한다.

@@ -4,6 +4,10 @@ NUCODE 보드를 Arduino IDE Boards Manager로 설치하기 위한 공개 배포
 제품 개발 소스는 포함하지 않으며 Platform/Host Tool Archive와 Package Index만
 배포한다.
 
+정식 배포 자산은 이 저장소에서 직접 빌드하거나 수동 교체하지 않는다. 제품 소스
+저장소의 GitHub Actions가 불변 Pre-release를 게시하고, 실보드 HIL Evidence와
+`production-release` 승인 후 같은 자산을 정식 Release로 승격한다.
+
 ## Arduino IDE 설치 URL
 
 Arduino IDE의 `Preferences > Additional Boards Manager URLs`에 다음 주소를
@@ -143,8 +147,30 @@ release-manifest.json
 SHA256SUMS.txt
 ```
 
-대용량 Archive는 Git 이력에 Commit하지 않는다. `release-assets/v0.4.0`은
-`.gitignore` 대상이며 GitHub Release에만 업로드한다.
+대용량 Archive는 Git 이력에 Commit하지 않는다. 현재 정식 절차에서는 제품 소스
+저장소의 `Build and publish pre-release` Workflow가 GitHub Release Asset으로
+게시한다. `release-assets/`는 과거 수동 배포 기록용이며 신규 배포 입력으로
+사용하지 않는다.
+
+## Release 운영
+
+신규 Version 게시와 승격은 다음 순서를 따른다.
+
+1. 제품 소스 저장소에서 후보 계약과 Release Note를 Commit한다.
+2. GitHub Actions가 네 Host Archive를 빌드·시험하고 Pre-release와
+   `staging/v<version>/package_nucode_index.json`을 게시한다.
+3. 운영자가 게시된 후보를 실제 NU40에서 시험하고 HIL Evidence를 만든다.
+4. 별도 승인자가 Evidence를 승인한다.
+5. `production-release` Environment 승인 뒤 Actions가 동일 Asset을 정식/latest로
+   승격하고 Root Index를 갱신한다.
+6. 게시 완료 후 제품 소스 저장소의 배포 마감 도구로 Gate를 다시 잠근다.
+
+GitHub Release Asset을 같은 Tag에서 덮어쓰지 않는다. 실패 후보는 FAIL Evidence로
+보존하고 더 큰 새 Version을 만든다. Root Index 복구가 필요하면 제품 소스
+저장소의 `Roll back stable package index` Workflow를 사용한다.
+
+상세 명령과 사람 승인 절차는 제품 소스 저장소의
+[Release 운영자 독립 실행 가이드](https://github.com/EIDOSDATA/NU_nRF_Arduino_Platform/blob/main/00_Docs/03_%EA%B0%9C%EB%B0%9C%EC%9E%90_%EA%B0%80%EC%9D%B4%EB%93%9C/10_Release_%EC%9A%B4%EC%98%81%EC%9E%90_%EB%8F%85%EB%A6%BD_%EC%8B%A4%ED%96%89_%EA%B0%80%EC%9D%B4%EB%93%9C.md)를 따른다.
 
 ## 별도 Windows Clean PC 시험
 

@@ -1,5 +1,8 @@
 # Platform 0.3.1 GitHub 게시 절차
 
+> 역사 기록: 이 문서는 0.3.1 당시 수동 게시 절차다. 신규 Version에는 사용하지
+> 않는다. 현재는 제품 소스 저장소의 GitHub Actions와 HIL 승인 절차를 사용한다.
+
 ## 1. Git Commit과 Push
 
 GitHub Desktop에서 표시되는 0.3.1 Text 변경을 Commit하고 `main`에 Push한다.

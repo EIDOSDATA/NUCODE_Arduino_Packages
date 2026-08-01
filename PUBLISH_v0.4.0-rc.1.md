@@ -1,5 +1,8 @@
 # Platform 0.4.0-rc.1 GitHub 게시 절차
 
+> 역사 기록: 이 문서는 자동 Pre-release Workflow 도입 전의 수동 RC 절차다.
+> 신규 후보는 제품 소스 저장소의 Release 운영자 독립 실행 가이드를 따른다.
+
 ## 1. Text 변경 Push
 
 GitHub Desktop에서 다음 추적 파일을 Commit하고 `main`에 Push한다.
